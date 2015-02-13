@@ -126,7 +126,7 @@
                                   <input type="text" id="saisiedate" data-inline="false"  data-role="date">
                               </div>
                           </li>
-                      </ul>
+                      
                       
       <!-- Bouton d'envoi -->
                       
@@ -134,10 +134,6 @@
                           <input type="submit" value="Passer ordre" />
 
       </div>
-      <div data-role="footer" data-position="fixed" style="margin:auto; width: 1000px; height:auto; font-size:auto">
-        <a href='#' id='tutorielPrevious' class="ui-btn ui-corner-all ui-icon-arrow-l ui-btn-icon-notext ui-btn-inline"></a>
-        <p  id='pageTutoriel' style="text-align:center; display:inline-block; margin-left:9%;margin-right:9%"> 1/45 </p>
-        <a href="#" id='tutorielNext' class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-notext ui-btn-inline"></a>
-      </div>
+      
     </div>
 </div>
