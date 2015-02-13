@@ -1,153 +1,389 @@
-<!-- missions-->
-<div data-role="page" id="missions">
-      <div data-role="header">
-      <a href='#' data-rel="back" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext"></a>
-        <h1>Missions</h1>
-      </div>
-      <div data-role="content">
-            <div class="ui-block-a" style="height:75px;"><a href="#missionAchat"><img src="img/tutoriel icone rouge.png" class="bouton_acc"></a></div>
-      </div>
+//Déclaration des variables
+var argentDispOrdre;
+var dateProchBilanReel;
+var coursEntrep;
+var socket = io.connect(adresse_serveur);
+ 
+//Affichage de l'argent disponible
+socket.on('resultGetArgentDisponibleJoueur', function(data) {
+	argentDispOrdre=data.argent_disponible
+	argentDispOrdreAAfficher="Argent disponible : "+argentDispOrdre+" ฿"
+	$("#consult_argentDisp").text(argentDispOrdreAAfficher);	
+});
 
-      <!--Page mission Achat -->
 
-<!-- Onglet mission achat UN ORDRE -->
-<div data-role="page" id="missionAchat">
-      <div data-role="header">
-      <a href='#' data-rel="back" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext"></a>
-        <h1>Mission Achat</h1>
-      </div>
-      <div data-role="content">
+	//Recuperer la valeur du cours de l'entreprise
+	$(function() {
+		
+					
+		var btGetCours = document.getElementById("btGetCours");
 
-                  <!-- Nom de l'entreprise -->     
-                      
-                <label for="select-custom-100">Entreprise</label>
-                        <select name="select-custom-100" id="Selectentreprise" data-native-menu="false">
-                              <option value="Veuiller sélectionner une entreprise" selected="selected">Veuillez sélectionner une entreprise</option>
-                              <option value="Hill Tone">Hill Tone</option>
-                              <option value="Genius Electrics">Genius Electrics</option>
-                              <option value="SoTech Materials">SoTech Materials</option>
-                              <option value="ITech">ITech</option>
-                              <option value="Miam Inc.">Miam Inc.</option>
-                              <option value="Campanule">Campanule</option>
-                              <option value="Wilbedon & Co">Wilbedon & Co</option>
-                              <option value="Blue Telecom">Blue Telecom</option>
-                              <option value="Green Energy & Co">Green Energy & Co</option>
-                              <option value="Biotech">Biotech</option>
-                              <option value="Total Logistics">Total Logistics</option>
-                              <option value="Brodewei">Brodewei</option>
-                              <option value="Center Park">Center Park</option>
-                              <option value="Mech. Entreprise">Mech. Entreprise</option>
-                              <option value="Club Mad">Club Mad</option>
-                              <option value="Sport Center">Sport Center</option>
-                              <option value="Leonard Construction">Leonard Construction</option>
-                              <option value="Doua Postal">Doua Postal</option>
-                              <option value="ORPIste">ORPIste</option>
-                              <option value="Palais des Congrès">Palais des Congrès</option>
-                              <option value="Airboost">Airboost</option>
-                              <option value="Lion Formation">Lion Formation</option>
-                              <option value="Pedro de Fermat">Pedro de Fermat</option>
-                              <option value="Badison Square Garden">Badison Square Garden</option>
-                              <option value="Formula One">Formula One</option>
+		var values;
+	
+		socket.on("resultGetCoursEntreprise", function(datas){
+	
+			values = [{ data: datas, label: "Cours", }];
 
-                          </select>                        
-        </div>
-</div>        
-          
-                <!-- Type d'ordre  -->
-  
+			$.plot("#placeholder", values, {
+				xaxis: {
+					mode: "time",
+					min: (new Date(currentYear,currentMonth,currentDay)).getTime(),
+					max: (new Date(currentYear,currentMonth,currentDay+1)).getTime(),
+			},
+				lines: {fill:true},
+				legend: {position:"nw", backgroundOpacity:0.3}		
+				//	zoom: {interactive: true},
+				//	pan: {interactive: true}
+		});	
+	});
+
+    //Recuperer la date actuelle
+
+        var currentMonth=(new Date()).getMonth() ;
+		var currentDay=(new Date()).getDate();
+		var currentYear=(new Date()).getFullYear();
+				
+		$("#today").click(function (event) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			$.plot("#placeholder", values, {
+				xaxis: {
+					mode: "time",
+					min: (new Date(currentYear,currentMonth,currentDay)).getTime(),
+					max: (new Date(currentYear,currentMonth,currentDay+1)).getTime(),
+				},
+				lines: {fill:true},
+				legend: {position:"nw", backgroundOpacity:0.3},
+			});
+			return false;
+		});
+
+		
+		$("#lastweek").click(function (event) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			$.plot("#placeholder", values, {
+				xaxis: {
+					mode: "time",
+					minTickSize: [1, "day"],
+					min: (new Date(currentYear,currentMonth,currentDay-7)).getTime(),
+					max: (new Date(currentYear,currentMonth,currentDay+1)).getTime(),
+					timeformat: "%e/%m",
+				//	dayNames: ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"]
+				},
+				lines: {fill:true},
+				legend: {position:"nw", backgroundOpacity:0.3},
+			});
+			return false;
+		});
+		
+		$("#lastmonth").click(function (event) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			$.plot("#placeholder", values, {
+				xaxis: {
+					mode: "time",
+					min: (new Date(currentYear, currentMonth-1, currentDay)).getTime(),
+					max: (new Date(currentYear, currentMonth, currentDay)).getTime(),
+				timeformat: "%e/%m",
+				},
+				lines: {fill:true},
+				legend: {position:"nw", backgroundOpacity:0.3},
+			});
+			return false;
+		});
+
+	});
+
+	//Champs desactive lors du chargement de la page
+              $( "#saisiedate" ).prop( "disabled", true );
               
-                          <label for="select-custom-51">Type d'ordre</label>
-                          <select name="select-custom-51" id="selectordre" data-native-menu="false">
-                              <option value="cours_limite" selected="selected">Ordre à cours limité</option>
-                              <option value="au_marche">Ordre au marché </option>
-                              <option value="seuil_declenchement">Ordre à déclenchement </option>
-                              <option value="meilleure_limite">Ordre à la meilleure limite</option>
-                          </select>
-                      
-                <!-- Listview qui contient PRIX, NOMBRE et DATE DE VALIDITE  -->
-                      
-                      <ul data-role="listview" data-inset="true">
-                      
-                <!--PRIX-->                   
-                          <li class="ui-field-contain">
-                            <div>
-                            <label for="Prix">Prix (en ฿)</label>
-                            <input type="number" name="number" id="Prix" value=""  /> 
-                             </div>
-                             <div id="consult_argentDisp">
-                             </div>
-                          </li>  
-                          
-    <!--TYPE DE DECLENCHEMENT-->                   
-                          <li class="ui-field-contain" style="display:none;" id="declenchement">
-                            <fieldset data-role="controlgroup" data-type="horizontal" style="border:none;" id="typedeclenchement">
-                                <legend>Type de déclenchement</legend>
-                                <input type="radio" name="radio-choice-type-declenchement" id="radio-choice-h-2a" value="Seuil" checked="checked">
-                                <label for="radio-choice-h-2a">Seuil</label>
-                                <input type="radio" name="radio-choice-type-declenchement" id="radio-choice-h-2b" value="Plage">
-                                <label for="radio-choice-h-2b">Plage</label>
-                            </fieldset>  
-                                                    
-      <!--SAISIE DU SEUIL OU DE LA PLAGE-->    
+              //Initialisation du datepicker lors du chargement de la page
+              $('#saisiedate').datepicker("setDate", new Date());
+        
+              // Changement du label en fonction du click pour la date de validité, le clik sur Date rend abled la zone input, le datepicker peut apparaître sur click de l'utilisateur
+  
+              $("#validite input").on("click",function(event) { 
+  
+                  if(event.target.id == "radio-choice-2") {
+                      $( "#saisiedate" ).prop( "disabled", false );
+                      $( "#legendedate" ).text("Sélectionner la date");
+                  } else {
+                      $( "#legendedate" ).text('');
+                      $( "#saisiedate" ).prop( "disabled", true );
+                      if(event.target.id == "radio-choice-1") {
+                          $('#saisiedate').datepicker("setDate", new Date());	
+                      }
+                      if(event.target.id == "radio-choice-3"){
+                          $('#saisiedate').datepicker("setDate", dateProchBilanReel);
+						  $('#saisiedate').datepicker("refresh");
+                      }
+                  }
+              });
+ //Gestion de l'affichage des champs en fonction du type d'ordre choisi 
+			  
+			  $("#selectordre").on("change",function() {
 
-        <!--SAISIE DU SEUIL-->    
-      
-                            <label for="vseuil" style="margin-top:10px;"id="vseuillabel">Saisir le seuil
-                            </label>
-                            <textarea cols="40" rows="8" name="textarea" id="vseuil" style="width:80px; height:40px; resize:none;  margin-top:10px;">
-                            </textarea>  
+			//On remet le formulaire à zéro lorsque l'on change de type d'ordre, sauf le sens de l'ordre et le type d'ordre
+				//Prix
+					$("#Prix").val('');
+				//Slider Nombre
+					$('#Nombre').val(1).slider("refresh");
+				//Date de validite
+					$("#validite input").prop("checked",false).checkboxradio("refresh");
+					$("#radio-choice-1").prop("checked",true).checkboxradio("refresh");
+				//DatePicker
+					$('#saisiedate').datepicker("setDate", new Date()).datepicker("refresh");
+				//Type de déclenchement
+					$("#typedeclenchement input").prop("checked",false).checkboxradio("refresh");
+					$("#radio-choice-h-2a").prop("checked",true).checkboxradio("refresh");
+				//Seuil qui réapparaît, Plage qui disparaît
+					$("#vplage").hide();
+					$("#vplagelabel").hide();
+					$("#vseuil").show();	
+					$("#vseuillabel").show();					
+				//Valeur du seuil
+					$('#vseuil').val('');
+				//Initialiser la plage
+					$('#range-10a').val(1).slider("refresh");
+					$('#range-10b').val(100).slider("refresh");
+				  
+			    //Ordre à cours limité
+				   if ($(this).val() === 'cours_limite') { 
+					  $("#declenchement").hide();
+					  $("#Prix").prop("disabled",false);
+				  }
+			    //ordre au marché
+				  if ($(this).val() === 'au_marche') { 
+					  $("#declenchement").hide();
+					  $("#Prix").prop("disabled",true);
+				  }
+			    //Ordre à déclenchement
+				  if ($(this).val() === 'seuil_declenchement') {
+					  $("#declenchement").show();
+					  $("#Prix").prop("disabled",true);
 
-     <!--SAISIE DE LA PLAGE-->    
-                             
-                            <div data-role="rangeslider" style="margin-top:10px; display:none;" id="vplage">
-                              <label for="range-10a" id="vplagelabel" style="display:none; margin-top:10px;">Saisir la plage
-                                </label>
-                                <input type="range" name="range-10a" id="range-10a" min="0" max="100" step=".01" value="0">
-                                <label for="range-10b">Saisir la plage
-                                </label>
-                                <input type="range" name="range-10b" id="range-10b" min="0" max="100" step=".01" value="100">
-                              </div>
-                          
-                          </li>
-      <!--NOMBRE-->
-                      
-                          <li class="ui-field-contain">
-                              <label for="Nombre">Nombre</label>
-                              <input type="range" name="slider" id="Nombre" value="1" min="1" max="100"  />
-                          </li>
-                          
-      <!--Date de validite-->
-                          
-                          <li class="ui-field-contain">                 
-                              <fieldset data-role="controlgroup" data-type="horizontal" data-mini="false" id="validite" style="border:none">
-                                  <legend>Date de validité</legend>
-                                  <input type="radio" name="radio-choice-type-date" id="radio-choice-1" value="Aujourdhui" checked="true" >
-                                  <label for="radio-choice-1">Aujourd'hui</label>
-                                  <input type="radio" name="radio-choice-type-date" id="radio-choice-2" value="Date">
-                                  <label for="radio-choice-2">Date</label>
-                                  <input type="radio" name="radio-choice-type-date" id="radio-choice-3" value="Révocation">
-                                  <label for="radio-choice-3">Révocation</label>
-                              </fieldset>
-                              
-      <!-- Date Picker -->
-                              
-                              <div style="margin-top:10px">
-                                  <label for="saisiedate" id="legendedate"></label>
-                                  <input type="text" id="saisiedate" data-inline="false"  data-role="date">
-                              </div>
-                          </li>
-                      </ul>
-                      
-      <!-- Bouton d'envoi -->
-                      
-                       <div class="ui-field-contain">
-                          <input type="submit" value="Passer ordre" />
+				  }
+			    //Ordre à la meilleure limite
+				  if ($(this).val() === 'meilleure_limite') { 
+					  $("#declenchement").hide();
+					  $("#Prix").prop("disabled",true);
+				  }  
+				});
+			
+			//Champs et valeurs selon le type de déclenchement
+			$("#typedeclenchement input").on("click",function(event) { 								                //seuil
+				if (event.target.id=="radio-choice-h-2a") {
+				$("#vplage").hide();
+				$("#vplagelabel").hide();
+				$("#vseuil").show();	
+				$("#vseuillabel").show();
+				//On nettoie ce que le joueur a entré dans plage
+				$('#range-10a').val(1).slider("refresh");
+				$('#range-10b').val(100).slider("refresh");
+				}
+				//plage
+				if (event.target.id=="radio-choice-h-2b") {
+				$("#vseuil").hide();
+				$("#vseuillabel").hide();
+				$("#vplage").show();
+				$("#vplagelabel").show();	
+					//On nettoie ce que le joueur a entré dans seuil et le label saisir un seuil ! en cas d'oubli	
+				$('#vseuil').val('');	
+				//On initialise les valeurs du slider à plus ou moins 5,5%
+				var coursMoins=Math.round(coursEntrep*0.80*100)/100;
+				var coursPlus=Math.round(coursEntrep*1.2*100)/100;
+				$('#range-10a').prop('min',coursMoins).slider("refresh");
+				$('#range-10a').prop('max',coursPlus).slider("refresh");
+				$('#range-10b').prop('min',coursMoins).slider("refresh");
+				$('#range-10b').prop('max',coursPlus).slider("refresh");
+				//coursEntrep	
+				}					
+			});
+	
+ // Pas de texte dans des input nombres
+              $(document).on("keypress","#Prix, #Nombre,#vplage, #vseuil",function (e){
+                  var ev= e||window.event;
+                  var k=ev.keyCode || ev.which; 
+                  if ((k>57 || k<46) && (k!=8)) {
+                      ev.returnValue=false; 
+                      if (ev.preventDefault) 
+                          ev.preventDefault(); 
+                  }
+              });
+ // Envoi et réinitialisation du formulaire
+              
+              $('#commentForm').submit(function(event) {
+				  event.preventDefault();
+				  event.stopImmediatePropagation();
+				  	var peutAcheter=false;
+					var radio_type_date = $("input:radio[name='radio-choice-type-date']");
+					var index_type_date = radio_type_date.index(radio_type_date.filter(':checked'));
+					
+					//On récupère l'index actif du type de déclenchement
+					var radio_type_declenchement = $("input:radio[name='radio-choice-type-declenchement']");
+					var index_type_declenchement = radio_type_declenchement.index(radio_type_declenchement.filter(':checked'));
+					//On s'assure que le joueur ait rempli le champ prix (seul champ qui peut-être vide) en cas de choix de choix de l'ordre à cours limité
+					if ( !$('#Prix').val() && $('#selectordre').val()==='cours_limite' ){
+					alert('Il faut saisir un prix !');
+					}
+					else if ( !$('#vseuil').val() && $('#selectordre').val()==='seuil_declenchement' && index_type_declenchement==0  ) {
+					alert('Il faut saisir le seuil !');
+					}	
+					else {	
+					 
+						 //On récupère la valeur de la borne inférieure ou du seuil que l'on nommera minimum (et de même pour la borne sup lors d'une vente)
+						var minimum = $('#range-10a').val();
+						var maximum = $('#range-10b').val();
+						if ($('#selectordre').val() == 'seuil_declenchement') {
+							//si c'est un seuil
+							if (index_type_declenchement == 0) {
+								//si c'est un achat	
+								if ($('#select-custom-17').val() == 'achat') {
+									minimum = parseFloat($('#vseuil').val());
+									maximum = parseFloat($('#range-10b').val());
+								}
+								//si c'est une vente
+								else {
+									minimum = parseFloat($('#range-10a').val());
+									maximum = parseFloat($('#vseuil').val());
+								}
+							}
+	
+						}
 
-      </div>
-      <div data-role="footer" data-position="fixed" style="margin:auto; width: 1000px; height:auto; font-size:auto">
-        <a href='#' id='tutorielPrevious' class="ui-btn ui-corner-all ui-icon-arrow-l ui-btn-icon-notext ui-btn-inline"></a>
-        <p  id='pageTutoriel' style="text-align:center; display:inline-block; margin-left:9%;margin-right:9%"> 1/45 </p>
-        <a href="#" id='tutorielNext' class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-notext ui-btn-inline"></a>
-      </div>
-    </div>
-</div>
+// vérifier la possibilité d'achat en comparant dispo et prix des actions
+var prix_action
+						if (!$('#Prix').val()) {
+							prix_action = 0;
+						}
+						else {
+							prix_action = parseFloat($('#Prix').val());
+						}
+						
+					
+						//si vente, pas de tests
+						if ($('#select-custom-17 option:selected').val()=="vente") {
+					
+							peutAcheter=true;
+
+						} 
+						//sinon, si achat, tests sur la nature de l'ordre et la capacite du joueur à acheter
+						else {
+							//si ordre à cours limité 
+							if($('#selectordre option:selected').val()=="cours_limite")   {
+
+								if(argentDispOrdre < $("#Prix").val() * $("#Nombre").val()) {
+									alert("Vous n'avez pas l'argent disponible pour acheter");
+								}
+								else {
+									peutAcheter=true;
+								}
+							}
+							//ordre meilleure limite ou au marché
+							else if ($('#selectordre option:selected').val()=="meilleure_limite" || $('#selectordre option:selected').val()=="au_marche") {
+								
+								if(argentDispOrdre < coursEntrep * $("#Nombre").val()) {
+									
+								}
+								else {
+									peutAcheter=true;
+								}
+								
+							
+							}
+							// ordre à déclenchement
+							else  {
+								//Seuil	
+								if ($("#typedeclenchement input:checked").val()=="Seuil") {
+
+									if(argentDispOrdre < $("#Nombre").val() * $("#vseuil").val()) 		{
+		
+									alert("Vous n'avez pas l'argent disponible pour acheter");
+		
+									}
+									else {
+										peutAcheter=true;
+									}
+								}
+								else {
+									if(argentDispOrdre < $("#Nombre").val() * $("#range-10b").prop('max')) {
+		
+										alert("Vous n'avez pas l'argent disponible pour acheter");
+		
+									}
+									else {
+										peutAcheter=true;
+									}								
+								}
+							}
+							//
+						}
+						
+						if (peutAcheter) {
+														//On envoie les données de l'ordre
+							var dateAEnvoyer=new Date($('#saisiedate').datepicker("getDate"))	;					
+							socket.emit('setOrdre',{
+								idJoueur:idJoueur,
+								idEntreprise:$('#entreprise_active').data('id_entreprise'),
+								//parseFloat($('#entreprise_active').data("id_entreprise")),
+								sens:$('#select-custom-17').val(),
+								typeOrdre:$('#selectordre').val(),
+								prix:prix_action,
+								quantite:parseFloat($('#Nombre').val()),
+								borneInf:minimum,
+								borneSup:maximum,
+								dateValidite:dateAEnvoyer
+								});
+				
+							//On remet le formulaire à zéro après validation
+								//Sens de l'ordre
+							var myselectun = $( "#select-custom-17" );
+							myselectun[0].selectedIndex = 0;
+							myselectun.selectmenu( "refresh" );
+								//Type de l'ordre
+							var myselectdeux = $( "#selectordre" );
+							myselectdeux[0].selectedIndex = 0;
+							myselectdeux.selectmenu( "refresh" );
+								//Valeur du prix
+							$("#Prix").val('');
+								//Slider Nombre
+							$('#Nombre').val(1).slider("refresh");
+								//Date de validite
+							$("#validite input").prop("checked",false).checkboxradio("refresh");
+							$("#radio-choice-1").prop("checked",true).checkboxradio("refresh");
+							  //DatePicker
+							$('#saisiedate').datepicker("setDate", new Date()).datepicker("refresh");
+							//Type de déclenchement
+							$("#typedeclenchement input").prop("checked",false).checkboxradio("refresh");
+							$("#radio-choice-h-2a").prop("checked",true).checkboxradio("refresh");
+							//Valeur du seuil
+							$('#vseuil').val('');
+							//Initialiser la plage
+							$('#range-10a').val(1).slider("refresh");
+							$('#range-10b').val(100).slider("refresh");
+							
+							//Cacher la div déclenchement
+							$('#declenchement').hide();
+							
+							//Prix able
+							$("#Prix").prop("disabled",false);
+							
+							}
+						
+						
+					}
+
+				  //On envoie le résultat par défaut de la fonction submit, on est passé par socket.io
+				  return false;
+				});		
+});
+
+// Envoyer demande au serveur pour récupérer les données nécessaures
+$(document).on("pageshow", "#Entreprise", function() {
+	var socket = io.connect(adresse_serveur);			
+	
+	socket.emit("getArgentDisponibleJoueur",idJoueur);
+	socket.emit("getCoursEntreprise", $('#entreprise_active').data('id_entreprise'));
+
+});
